@@ -2779,7 +2779,6 @@ ERC20TokenMetadata describes information about an ERC20 token
 | `chain_id` | [bytes](#bytes) |  |  |
 | `details` | [TokenDetails](#evm.v1beta1.TokenDetails) |  |  |
 | `token_address` | [string](#string) |  |  |
-| `tx_hash` | [string](#string) |  |  |
 | `status` | [Status](#evm.v1beta1.Status) |  |  |
 | `is_external` | [bool](#bool) |  |  |
 | `burner_code` | [bytes](#bytes) |  |  |
@@ -3151,9 +3150,8 @@ TransferKey contains information for a transfer ownership or operatorship
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | STATUS_UNSPECIFIED | 0 | these enum values are used for bitwise operations, therefore they need to be powers of 2 |
-| STATUS_INITIALIZED | 1 |  |
-| STATUS_PENDING | 2 |  |
-| STATUS_CONFIRMED | 4 |  |
+| STATUS_PENDING | 1 |  |
+| STATUS_CONFIRMED | 2 |  |
 
 
 

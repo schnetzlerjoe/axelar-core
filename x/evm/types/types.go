@@ -122,11 +122,6 @@ func (t ERC20Token) GetAsset() string {
 	return t.metadata.Asset
 }
 
-// GetTxID returns the tx ID set with StartConfirmation
-func (t ERC20Token) GetTxID() Hash {
-	return t.metadata.TxHash
-}
-
 // GetDetails returns the details of the token
 func (t ERC20Token) GetDetails() TokenDetails {
 	return t.metadata.Details
@@ -220,37 +215,6 @@ func transferIDtoCommandID(transferID nexus.TransferID) CommandID {
 func (t ERC20Token) GetAddress() Address {
 	return t.metadata.TokenAddress
 
-}
-
-// RecordDeployment signals that the token confirmation is underway for the given tx ID
-func (t *ERC20Token) RecordDeployment(txID Hash) error {
-	switch {
-	case t.Is(NonExistent):
-		return fmt.Errorf("token %s non-existent", t.metadata.Asset)
-	case t.Is(Confirmed):
-		return fmt.Errorf("token %s already confirmed", t.metadata.Asset)
-	}
-
-	t.metadata.TxHash = txID
-	t.metadata.Status |= Pending
-	t.setMeta(t.metadata)
-
-	return nil
-}
-
-// RejectDeployment reverts the token state back to Initialized
-func (t *ERC20Token) RejectDeployment() error {
-	switch {
-	case t.Is(NonExistent):
-		return fmt.Errorf("token %s non-existent", t.metadata.Asset)
-	case !t.Is(Pending):
-		return fmt.Errorf("token %s not waiting confirmation (current status: %s)", t.metadata.Asset, t.metadata.Status.String())
-	}
-
-	t.metadata.Status = Initialized
-	t.metadata.TxHash = Hash{}
-	t.setMeta(t.metadata)
-	return nil
 }
 
 // ConfirmDeployment signals that the token was successfully confirmed

@@ -188,8 +188,7 @@ message ERC20TokenMetadata {
   TokenDetails details = 3 [ (gogoproto.nullable) = false ];
   string token_address = 4
       [ (gogoproto.nullable) = false, (gogoproto.customtype) = "Address" ];
-  string tx_hash = 5
-      [ (gogoproto.nullable) = false, (gogoproto.customtype) = "Hash" ];
+  reserved 5; // tx_hash was removed in v0.18
   reserved 6; // min_amount was removed in v0.15
   Status status = 7;
   bool is_external = 8;
@@ -203,9 +202,8 @@ enum Status {
   // these enum values are used for bitwise operations, therefore they need to
   // be powers of 2
   STATUS_UNSPECIFIED = 0 [ (gogoproto.enumvalue_customname) = "NonExistent" ];
-  STATUS_INITIALIZED = 1 [ (gogoproto.enumvalue_customname) = "Initialized" ];
-  STATUS_PENDING = 2 [ (gogoproto.enumvalue_customname) = "Pending" ];
-  STATUS_CONFIRMED = 4 [ (gogoproto.enumvalue_customname) = "Confirmed" ];
+  STATUS_PENDING = 1 [ (gogoproto.enumvalue_customname) = "Pending" ];
+  STATUS_CONFIRMED = 2 [ (gogoproto.enumvalue_customname) = "Confirmed" ];
 }
 
 message TransactionMetadata {

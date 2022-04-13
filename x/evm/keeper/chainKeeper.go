@@ -798,7 +798,7 @@ func (k chainKeeper) initTokenMetadata(ctx sdk.Context, asset string, details ty
 			Details:      details,
 			TokenAddress: address,
 			ChainID:      sdk.NewIntFromBigInt(chainID),
-			Status:       types.Initialized,
+			Status:       types.Pending,
 			IsExternal:   true,
 			BurnerCode:   burnerCode,
 		}
@@ -828,7 +828,7 @@ func (k chainKeeper) initTokenMetadata(ctx sdk.Context, asset string, details ty
 		Details:      details,
 		TokenAddress: types.Address(tokenAddr),
 		ChainID:      sdk.NewIntFromBigInt(chainID),
-		Status:       types.Initialized,
+		Status:       types.Pending,
 		IsExternal:   false,
 		BurnerCode:   burnerCode,
 	}

@@ -262,9 +262,11 @@ func (s msgServer) ConfirmToken(c context.Context, req *types.ConfirmTokenReques
 	keeper := s.ForChain(chain.Name)
 	token := keeper.GetERC20TokenByAsset(ctx, req.Asset.Name)
 
-	err := token.RecordDeployment(req.TxID)
-	if err != nil {
-		return nil, err
+	switch {
+	case token.Is(types.NonExistent):
+		return nil, fmt.Errorf("token %s non-existent", token.GetAsset())
+	case token.Is(types.Confirmed):
+		return nil, fmt.Errorf("token %s already confirmed", token.GetAsset())
 	}
 
 	period, ok := keeper.GetRevoteLockingPeriod(ctx)

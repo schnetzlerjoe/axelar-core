@@ -634,10 +634,6 @@ func TestLink_Success(t *testing.T) {
 		panic(err)
 	}
 
-	err = token.RecordDeployment(types.Hash(common.BytesToHash(rand.Bytes(common.HashLength))))
-	if err != nil {
-		panic(err)
-	}
 	err = token.ConfirmDeployment()
 	if err != nil {
 		panic(err)
@@ -1079,8 +1075,6 @@ func TestHandleMsgConfirmTokenDeploy(t *testing.T) {
 
 	t.Run("already registered", testutils.Func(func(t *testing.T) {
 		setup()
-		hash := common.BytesToHash(rand.Bytes(common.HashLength))
-		token.RecordDeployment(types.Hash(hash))
 		token.ConfirmDeployment()
 
 		_, err := server.ConfirmToken(sdk.WrapSDKContext(ctx), msg)
@@ -1523,7 +1517,7 @@ func createMockERC20Token(asset string, details types.TokenDetails) types.ERC20T
 	meta := types.ERC20TokenMetadata{
 		Asset:        asset,
 		Details:      details,
-		Status:       types.Initialized,
+		Status:       types.Pending,
 		TokenAddress: types.Address(common.BytesToAddress(rand.Bytes(common.AddressLength))),
 		ChainID:      sdk.NewIntFromUint64(uint64(rand.I64Between(1, 10))),
 	}
