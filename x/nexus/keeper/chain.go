@@ -8,6 +8,7 @@ import (
 	"github.com/axelarnetwork/axelar-core/utils"
 	"github.com/axelarnetwork/axelar-core/x/nexus/exported"
 	"github.com/axelarnetwork/axelar-core/x/nexus/types"
+	"github.com/axelarnetwork/utils/slices"
 )
 
 func (k Keeper) getChainStates(ctx sdk.Context) (chainStates []types.ChainState) {
@@ -30,6 +31,19 @@ func (k Keeper) setChainState(ctx sdk.Context, chainState types.ChainState) {
 
 func (k Keeper) getChainState(ctx sdk.Context, chain exported.Chain) (chainState types.ChainState, ok bool) {
 	return chainState, k.getStore(ctx).Get(chainStatePrefix.Append(utils.LowerCaseKey(chain.Name)), &chainState)
+}
+
+// DeregisterAsset indicates that the specified asset is supported by the given chain
+func (k Keeper) DeregisterAsset(ctx sdk.Context, chain exported.Chain, asset string) error {
+	chainState, _ := k.getChainState(ctx, chain)
+	chainState.Chain = chain
+	chainState.Assets = slices.Filter(chainState.Assets, func(a exported.Asset) bool {
+		return a.Denom != asset
+	})
+
+	k.setChainState(ctx, chainState)
+
+	return nil
 }
 
 // RegisterAsset indicates that the specified asset is supported by the given chain
