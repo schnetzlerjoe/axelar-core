@@ -10,6 +10,7 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -86,6 +87,7 @@ type AppModule struct {
 	msgSvcRouter *baseapp.MsgServiceRouter
 	router       sdk.Router
 	bank         types.Banker
+	upgrade      upgradekeeper.Keeper
 }
 
 // NewAppModule creates a new AppModule object
@@ -97,6 +99,7 @@ func NewAppModule(
 	tss types.Tss,
 	snapshotter types.Snapshotter,
 	bank types.Banker,
+	upgrade upgradekeeper.Keeper,
 	msgSvcRouter *baseapp.MsgServiceRouter,
 	router sdk.Router,
 ) AppModule {
@@ -111,6 +114,7 @@ func NewAppModule(
 		msgSvcRouter:   msgSvcRouter,
 		router:         router,
 		bank:           bank,
+		upgrade:        upgrade,
 	}
 }
 
@@ -154,7 +158,7 @@ func (am AppModule) RegisterServices(module.Configurator) {}
 
 // BeginBlock executes all state transitions this module requires at the beginning of each new block
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	BeginBlocker(ctx, req, am.keeper)
+	BeginBlocker(ctx, req, am.keeper, am.upgrade)
 }
 
 // EndBlock executes all state transitions this module requires at the end of each new block

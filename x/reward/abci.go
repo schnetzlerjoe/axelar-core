@@ -3,6 +3,8 @@ package reward
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/axelarnetwork/axelar-core/x/reward/exported"
@@ -11,8 +13,19 @@ import (
 	tsstypes "github.com/axelarnetwork/axelar-core/x/tss/types"
 )
 
+var migrated bool
+
 // BeginBlocker is called at the beginning of every block
-func BeginBlocker(ctx sdk.Context, _ abci.RequestBeginBlock, _ types.Rewarder) {}
+func BeginBlocker(ctx sdk.Context, _ abci.RequestBeginBlock, _ types.Rewarder, upgrade upgradekeeper.Keeper) {
+	if !migrated {
+		upgrade.ApplyUpgrade(ctx, upgradetypes.Plan{
+			Name: "v0.18",
+			Info: "v0.18",
+		})
+
+		migrated = true
+	}
+}
 
 // EndBlocker is called at the end of every block, process external chain voting inflation
 func EndBlocker(ctx sdk.Context, _ abci.RequestEndBlock, k types.Rewarder, n types.Nexus, m types.Minter, s types.Staker, t types.Tss, ss types.Snapshotter) []abci.ValidatorUpdate {
