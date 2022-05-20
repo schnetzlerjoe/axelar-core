@@ -1,9 +1,7 @@
 name: Upload Binaries and Docker Image
 
 on:
-  push:
-    branches:
-      - feat/rocksdb-v0.10.7
+  workflow_dispatch:
 
 jobs:
   release-binaries:
