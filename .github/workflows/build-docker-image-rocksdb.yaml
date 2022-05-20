@@ -1,0 +1,37 @@
+name: Build and push core rocksdb docker image
+
+on:
+  push:
+    branches:
+      - feat/rocksdb-v0.10.7
+
+jobs:
+  build-and-push-rdb-docker-image:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-20.04
+    runs-on: ${{ matrix.os }}
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up ssh agent
+        uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.CICD_RSA_KEY }}
+
+      - name: Build docker image 
+        run: |
+          docker build -f Dockerfile.rocksdb -t axelard-v0.10.7-rdb .
+
+      - name: Push to ECR (normal)
+        uses: jwalton/gh-ecr-push@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: us-east-2
+          local-image: axelard-v0.10.7-rdb
+          image: axelar-core-rdb:axelard-v0.10.7-rdb
+
