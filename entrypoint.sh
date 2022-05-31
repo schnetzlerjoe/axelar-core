@@ -1,5 +1,5 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+ set -e
 
 trap stop_gracefully TERM INT
 
