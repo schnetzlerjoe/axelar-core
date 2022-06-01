@@ -4,11 +4,11 @@ FROM golang:1.17-bullseye as build
 RUN apt update && apt install  ca-certificates git make gcc g++ libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev -y
 WORKDIR axelar
 
-RUN git clone https://github.com/facebook/rocksdb.git && cd rocksdb && git checkout v6.16.3 
-RUN export CXXFLAGS='-Wno-error=deprecated-copy -Wno-error=pessimizing-move -Wno-error=class-memaccess' 
-RUN cd rocksdb && make shared_lib 
+RUN git clone https://github.com/facebook/rocksdb.git && cd rocksdb && git checkout v6.16.3
+RUN export CXXFLAGS='-Wno-error=deprecated-copy -Wno-error=pessimizing-move -Wno-error=class-memaccess'
+RUN cd rocksdb && make shared_lib
 RUN cd rocksdb && make install-shared INSTALL_PATH=/usr
-RUN cd rocksdb && echo 'export LD_LIBRARY_PATH=/usr/local/lib' >> $HOME/.bashrc
+RUN touch $HOME/.bashrc && echo 'export LD_LIBRARY_PATH=/usr/local/lib' >> $HOME/.bashrc
 
 COPY ./go.mod .
 COPY ./go.sum .
@@ -17,13 +17,11 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM ubuntu:20.04
 RUN apt update && apt install jq -y
 ARG USER_ID=1000
 ARG GROUP_ID=1001
-COPY --from=build /go/axelar/bin/* /usr/local/bin/
 RUN useradd --uid ${USER_ID} axelard && groupmod --gid ${GROUP_ID} axelard && usermod -aG axelard axelard
-RUN chown axelard /home
+RUN chown axelard /home && mv bin/axelard /usr/local/bin && chmod 777 /usr/local/bin/axelard
 USER axelard
 COPY ./entrypoint.sh /entrypoint.sh
 
