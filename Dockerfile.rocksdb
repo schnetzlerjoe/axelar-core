@@ -8,7 +8,7 @@ RUN git clone https://github.com/facebook/rocksdb.git && cd rocksdb && git check
 RUN export CXXFLAGS='-Wno-error=deprecated-copy -Wno-error=pessimizing-move -Wno-error=class-memaccess'
 RUN cd rocksdb && make shared_lib
 RUN cd rocksdb && make install-shared INSTALL_PATH=/usr
-RUN echo 'export LD_LIBRARY_PATH=/usr/local/lib' >> $HOME/.bashrc
+RUN touch $HOME/.bashrc && echo 'export LD_LIBRARY_PATH=/usr/local/lib' >> $HOME/.bashrc
 
 COPY ./go.mod .
 COPY ./go.sum .
@@ -21,10 +21,9 @@ RUN apt update && apt install jq -y
 ARG USER_ID=1000
 ARG GROUP_ID=1001
 RUN useradd --uid ${USER_ID} axelard && groupmod --gid ${GROUP_ID} axelard && usermod -aG axelard axelard
-RUN chown axelard /home
+RUN chown axelard /home && mv bin/axelard /usr/local/bin && chmod 777 /usr/local/bin/axelard
 USER axelard
 COPY ./entrypoint.sh /entrypoint.sh
-RUN echo 'export LD_LIBRARY_PATH=/usr/local/lib' >> $HOME/.bashrc && export LD_LIBRARY_PATH=/usr/local/lib
 
 # The home directory of axelar-core where configuration/genesis/data are stored
 ENV HOME_DIR /home/axelard
@@ -49,5 +48,7 @@ RUN mkdir -p /home/axelard/shared && chown axelard /home/axelard/shared
 RUN mkdir -p /home/axelard/genesis && chown axelard /home/axelard/genesis
 RUN mkdir -p /home/axelard/scripts && chown axelard /home/axelard/scripts
 RUN mkdir -p /home/axelard/conf && chown axelard /home/axelard/conf
+RUN mkdir -p /home/axelard/.axelar/data/snapshots/metadata.db && chown axelard /home/axelard/.axelar/data/snapshots/metadata.db
+
 
 ENTRYPOINT ["/entrypoint.sh"]

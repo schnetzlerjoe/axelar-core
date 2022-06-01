@@ -3,6 +3,10 @@
 
 trap stop_gracefully TERM INT
 
+mkdir -p /home/axelard/.axelar/data/snapshots/metadata.db
+chown axelard /home/axelard/.axelar/data/snapshots/metadata.db
+chmod -R 777 /home/axelard/.axelar/data/snapshots/metadata.db
+
 stop_gracefully(){
   echo "stopping all processes"
   killall "axelard"
