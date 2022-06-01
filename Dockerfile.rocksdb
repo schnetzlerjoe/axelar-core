@@ -48,7 +48,5 @@ RUN mkdir -p /home/axelard/shared && chown axelard /home/axelard/shared
 RUN mkdir -p /home/axelard/genesis && chown axelard /home/axelard/genesis
 RUN mkdir -p /home/axelard/scripts && chown axelard /home/axelard/scripts
 RUN mkdir -p /home/axelard/conf && chown axelard /home/axelard/conf
-RUN mkdir -p /home/axelard/.axelar/data/snapshots/metadata.db && chown axelard /home/axelard/.axelar/data/snapshots/metadata.db
-
 
 ENTRYPOINT ["/entrypoint.sh"]
