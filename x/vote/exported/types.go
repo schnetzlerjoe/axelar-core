@@ -21,6 +21,17 @@ type VoteHandler interface {
 	HandleResult(ctx sdk.Context, result codec.ProtoMarshaler) error
 }
 
+// UnpackInterfaces implements UnpackInterfacesMessage
+func (m PollModuleMetadata) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	if m.Metadata != nil {
+		var metadata codec.ProtoMarshaler
+
+		return unpacker.UnpackAny(m.Metadata, &metadata)
+	}
+
+	return nil
+}
+
 // ValidateBasic returns an error if the poll module metadata is not valid; nil otherwise
 func (m PollModuleMetadata) ValidateBasic() error {
 	if err := utils.ValidateString(m.Module); err != nil {

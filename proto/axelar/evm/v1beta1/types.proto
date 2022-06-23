@@ -9,6 +9,8 @@ import "axelar/tss/exported/v1beta1/types.proto";
 
 option (gogoproto.goproto_getters_all) = false;
 
+message VoteMetadata { string chain = 1; }
+
 message VoteEvents {
   string chain = 1
       [ (gogoproto.casttype) =

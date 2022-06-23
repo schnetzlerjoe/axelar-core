@@ -203,6 +203,7 @@
     - [TransactionMetadata](#axelar.evm.v1beta1.TransactionMetadata)
     - [TransferKey](#axelar.evm.v1beta1.TransferKey)
     - [VoteEvents](#axelar.evm.v1beta1.VoteEvents)
+    - [VoteMetadata](#axelar.evm.v1beta1.VoteMetadata)
   
     - [BatchedCommandsStatus](#axelar.evm.v1beta1.BatchedCommandsStatus)
     - [DepositStatus](#axelar.evm.v1beta1.DepositStatus)
@@ -3240,6 +3241,21 @@ TransferKey contains information for a transfer ownership or operatorship
 | ----- | ---- | ----- | ----------- |
 | `chain` | [string](#string) |  |  |
 | `events` | [Event](#axelar.evm.v1beta1.Event) | repeated |  |
+
+
+
+
+
+
+<a name="axelar.evm.v1beta1.VoteMetadata"></a>
+
+### VoteMetadata
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `chain` | [string](#string) |  |  |
 
 
 
