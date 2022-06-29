@@ -359,7 +359,7 @@ func handleMultisigTransferKey(ctx sdk.Context, event types.Event, ck types.Chai
 }
 
 func handleConfirmedEvents(ctx sdk.Context, bk types.BaseKeeper, n types.Nexus, s types.Signer) error {
-	shouldHandleEvent := func(e codec.ProtoMarshaler) bool {
+	shouldHandleEvent := func(e codec.ProtoMarshaler) (shouldHandle bool) {
 		event := e.(*types.Event)
 
 		var destinationChainName nexus.ChainName
@@ -429,8 +429,11 @@ func handleConfirmedEvents(ctx sdk.Context, bk types.BaseKeeper, n types.Nexus, 
 			continue
 		}
 
+		maxHandleCount := 20
+		handledCount := 0
+
 		var event types.Event
-		for queue.DequeueUntil(&event, shouldHandleEvent) {
+		for handledCount <= maxHandleCount && queue.DequeueUntil(&event, shouldHandleEvent) {
 			bk.Logger(ctx).Debug("handling confirmed event",
 				"chain", chain.Name.String(),
 				"eventID", event.GetID(),
@@ -481,6 +484,8 @@ func handleConfirmedEvents(ctx sdk.Context, bk types.BaseKeeper, n types.Nexus, 
 			if err := ck.SetEventCompleted(ctx, event.GetID()); err != nil {
 				return err
 			}
+
+			handledCount++
 		}
 	}
 
