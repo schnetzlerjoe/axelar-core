@@ -1,0 +1,26 @@
+syntax = "proto3";
+package axelar.vote.exported.v0_17;
+
+option go_package = "github.com/axelarnetwork/axelar-core/x/vote/exported_0_17";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+import "cosmos_proto/cosmos.proto";
+
+option (gogoproto.goproto_getters_all) = false;
+
+// PollKey represents the key data for a poll
+message PollKey {
+  option (gogoproto.goproto_stringer) = false;
+
+  string module = 1;
+  string id = 2 [ (gogoproto.customname) = "ID" ];
+}
+
+message Voter {
+  bytes validator = 1 [ (gogoproto.casttype) =
+                            "github.com/cosmos/cosmos-sdk/types.ValAddress" ];
+  int64 voting_power = 2;
+}
+
+message Vote { repeated google.protobuf.Any results = 1; }

@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/axelarnetwork/axelar-core/utils"
 	snapshot "github.com/axelarnetwork/axelar-core/x/snapshot/exported"
@@ -50,6 +51,19 @@ func (id PollID) String() string {
 // Deprecated: String converts the given poll key to string
 func (m PollKey) String() string {
 	return fmt.Sprintf("%s_%s", m.Module, m.ID)
+}
+
+// Deprecated: Validate performs a stateless validity check to ensure PollKey has been properly initialized
+func (m PollKey) Validate() error {
+	if m.Module == "" {
+		return fmt.Errorf("missing module")
+	}
+
+	if err := utils.ValidateString(m.ID, ""); err != nil {
+		return sdkerrors.Wrap(err, "invalid poll key ID")
+	}
+
+	return nil
 }
 
 // PollBuilder is a builder that is used to build up the poll metadata

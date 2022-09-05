@@ -9,12 +9,14 @@ import (
 
 	axelarnettypes "github.com/axelarnetwork/axelar-core/x/axelarnet/types"
 	evmtypes "github.com/axelarnetwork/axelar-core/x/evm/types"
+
+	evmtypes_0_17 "github.com/axelarnetwork/axelar-core/x/evm/types_0_17"
 	nexustypes "github.com/axelarnetwork/axelar-core/x/nexus/types"
 	permissiontypes "github.com/axelarnetwork/axelar-core/x/permission/types"
 	rewardtypes "github.com/axelarnetwork/axelar-core/x/reward/types"
 	snapshottypes "github.com/axelarnetwork/axelar-core/x/snapshot/types"
 	tsstypes "github.com/axelarnetwork/axelar-core/x/tss/types"
-	votetypes "github.com/axelarnetwork/axelar-core/x/vote/types"
+	votetypes_0_17 "github.com/axelarnetwork/axelar-core/x/vote/types_0_17"
 )
 
 type customRegistry interface {
@@ -44,16 +46,22 @@ func RegisterLegacyMsgInterfaces(registry cdctypes.InterfaceRegistry) {
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.LinkRequest", &evmtypes.LinkRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.ConfirmTokenRequest", &evmtypes.ConfirmTokenRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.ConfirmDepositRequest", &evmtypes.ConfirmDepositRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.VoteConfirmDepositRequest", &evmtypes_0_17.VoteConfirmDepositRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.ConfirmTransferKeyRequest", &evmtypes.ConfirmTransferKeyRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.VoteConfirmTransferKeyRequest", &evmtypes_0_17.VoteConfirmTransferKeyRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.CreatePendingTransfersRequest", &evmtypes.CreatePendingTransfersRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.CreateDeployTokenRequest", &evmtypes.CreateDeployTokenRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.VoteConfirmTokenRequest", &evmtypes_0_17.VoteConfirmTokenRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.CreateBurnTokensRequest", &evmtypes.CreateBurnTokensRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.CreateTransferOwnershipRequest", &evmtypes.CreateTransferOwnershipRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.CreateTransferOperatorshipRequest", &evmtypes.CreateTransferOperatorshipRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.SignCommandsRequest", &evmtypes.SignCommandsRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.AddChainRequest", &evmtypes.AddChainRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.ConfirmChainRequest", &evmtypes_0_17.ConfirmChainRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.VoteConfirmChainRequest", &evmtypes_0_17.VoteConfirmChainRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.SetGatewayRequest", &evmtypes.SetGatewayRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.ConfirmGatewayTxRequest", &evmtypes.ConfirmGatewayTxRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.VoteConfirmGatewayTxRequest", &evmtypes_0_17.VoteConfirmGatewayTxRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/evm.v1beta1.RetryFailedEventRequest", &evmtypes.RetryFailedEventRequest{})
 
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/nexus.v1beta1.RegisterChainMaintainerRequest", &nexustypes.RegisterChainMaintainerRequest{})
@@ -82,5 +90,5 @@ func RegisterLegacyMsgInterfaces(registry cdctypes.InterfaceRegistry) {
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/tss.v1beta1.SubmitMultisigPubKeysRequest", &tsstypes.SubmitMultisigPubKeysRequest{})
 	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/tss.v1beta1.SubmitMultisigSignaturesRequest", &tsstypes.SubmitMultisigSignaturesRequest{})
 
-	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/vote.v1beta1.VoteRequest", &votetypes.VoteRequest{})
+	r.RegisterCustomTypeURL((*sdk.Msg)(nil), "/vote.v1beta1.VoteRequest", &votetypes_0_17.VoteRequest{})
 }
