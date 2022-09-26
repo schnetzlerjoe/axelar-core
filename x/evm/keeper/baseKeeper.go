@@ -76,11 +76,11 @@ func (k BaseKeeper) InitChains(ctx sdk.Context) {
 	defer utils.CloseLogError(iter, k.Logger(ctx))
 
 	for ; iter.Valid(); iter.Next() {
-		_, ok := k.ForChain(nexus.ChainName(iter.Key())).(chainKeeper).getSubspace(ctx)
+		_, ok := k.ForChain(nexus.ChainName(iter.Value())).(chainKeeper).getSubspace(ctx)
 		if !ok {
-			panic(fmt.Sprintf("subspace for EVM chain %s should exist", string(iter.Key())))
+			panic(fmt.Sprintf("subspace for EVM chain %s should exist", iter.Value()))
 		}
 
-		k.Logger(ctx).Debug(fmt.Sprintf("loaded evm subspace %s", string(iter.Key())))
+		k.Logger(ctx).Debug(fmt.Sprintf("loaded evm subspace %s", iter.Value()))
 	}
 }
