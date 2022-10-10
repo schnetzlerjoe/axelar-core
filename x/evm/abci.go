@@ -486,68 +486,127 @@ func handleConfirmedEvents(ctx sdk.Context, bk types.BaseKeeper, n types.Nexus, 
 		return true
 	}
 
-	for _, chain := range n.GetChains(ctx) {
-		ck := bk.ForChain(chain.Name)
-		queue := ck.GetConfirmedEventQueue(ctx)
-		// skip if confirmed event queue is empty
-		if queue.IsEmpty() {
+	queue := bk.GetEventQueue(ctx)
+
+	endBlockerLimit := 100
+	handledEvents := int64(0)
+	var event types.Event
+	for handledEvents < endBlockerLimit && queue.Dequeue(&event) {
+		handledEvents++
+		ck := bk.ForChain(event.Chain)
+		chain := n.GetChain(ctx, event.Chain)
+
+		if !shouldHandleEvent(&event) {
+			funcs.MustNoErr(ck.SetEventFailed(ctx, event.GetID()))
 			continue
 		}
 
-		endBlockerLimit := ck.GetParams(ctx).EndBlockerLimit
-		handledEvents := int64(0)
-		var event types.Event
-		for handledEvents < endBlockerLimit && queue.Dequeue(&event) {
-			handledEvents++
-			if !shouldHandleEvent(&event) {
-				funcs.MustNoErr(ck.SetEventFailed(ctx, event.GetID()))
-				continue
-			}
+		bk.Logger(ctx).Debug("handling confirmed event",
+			"chain", chain.Name.String(),
+			"eventID", event.GetID(),
+		)
 
-			bk.Logger(ctx).Debug("handling confirmed event",
+		var ok bool
+
+		switch event.GetEvent().(type) {
+		case *types.Event_ContractCall:
+			ok = handleContractCall(ctx, event, bk, n, multisig)
+		case *types.Event_ContractCallWithToken:
+			ok = handleContractCallWithToken(ctx, event, bk, n, multisig)
+		case *types.Event_TokenSent:
+			ok = handleTokenSent(ctx, event, bk, n)
+		case *types.Event_Transfer:
+			ok = handleConfirmDeposit(ctx, event, ck, n, chain)
+		case *types.Event_TokenDeployed:
+			ok = handleTokenDeployed(ctx, event, ck, chain)
+		case *types.Event_MultisigOperatorshipTransferred:
+			ok = handleMultisigTransferKey(ctx, event, ck, multisig, chain)
+		default:
+			bk.Logger(ctx).Debug("unsupported event type %T", event,
 				"chain", chain.Name.String(),
 				"eventID", event.GetID(),
 			)
 
-			var ok bool
+			ok = false
+		}
 
-			switch event.GetEvent().(type) {
-			case *types.Event_ContractCall:
-				ok = handleContractCall(ctx, event, bk, n, multisig)
-			case *types.Event_ContractCallWithToken:
-				ok = handleContractCallWithToken(ctx, event, bk, n, multisig)
-			case *types.Event_TokenSent:
-				ok = handleTokenSent(ctx, event, bk, n)
-			case *types.Event_Transfer:
-				ok = handleConfirmDeposit(ctx, event, ck, n, chain)
-			case *types.Event_TokenDeployed:
-				ok = handleTokenDeployed(ctx, event, ck, chain)
-			case *types.Event_MultisigOperatorshipTransferred:
-				ok = handleMultisigTransferKey(ctx, event, ck, multisig, chain)
-			default:
-				bk.Logger(ctx).Debug("unsupported event type %T", event,
-					"chain", chain.Name.String(),
-					"eventID", event.GetID(),
-				)
+		if !ok {
+			funcs.MustNoErr(ck.SetEventFailed(ctx, event.GetID()))
+			continue
+		}
 
-				ok = false
-			}
+		bk.Logger(ctx).Debug("completed handling event",
+			"chain", chain.Name.String(),
+			"eventID", event.GetID(),
+		)
 
-			if !ok {
-				funcs.MustNoErr(ck.SetEventFailed(ctx, event.GetID()))
-				continue
-			}
-
-			bk.Logger(ctx).Debug("completed handling event",
-				"chain", chain.Name.String(),
-				"eventID", event.GetID(),
-			)
-
-			if err := ck.SetEventCompleted(ctx, event.GetID()); err != nil {
-				return err
-			}
+		if err := ck.SetEventCompleted(ctx, event.GetID()); err != nil {
+			return err
 		}
 	}
+
+	// for _, chain := range n.GetChains(ctx) {
+	// 	ck := bk.ForChain(chain.Name)
+	// 	queue := ck.GetConfirmedEventQueue(ctx)
+	// 	// skip if confirmed event queue is empty
+	// 	if queue.IsEmpty() {
+	// 		continue
+	// 	}
+
+	// 	endBlockerLimit := ck.GetParams(ctx).EndBlockerLimit
+	// 	handledEvents := int64(0)
+	// 	var event types.Event
+	// 	for handledEvents < endBlockerLimit && queue.Dequeue(&event) {
+	// 		handledEvents++
+	// 		if !shouldHandleEvent(&event) {
+	// 			funcs.MustNoErr(ck.SetEventFailed(ctx, event.GetID()))
+	// 			continue
+	// 		}
+
+	// 		bk.Logger(ctx).Debug("handling confirmed event",
+	// 			"chain", chain.Name.String(),
+	// 			"eventID", event.GetID(),
+	// 		)
+
+	// 		var ok bool
+
+	// 		switch event.GetEvent().(type) {
+	// 		case *types.Event_ContractCall:
+	// 			ok = handleContractCall(ctx, event, bk, n, multisig)
+	// 		case *types.Event_ContractCallWithToken:
+	// 			ok = handleContractCallWithToken(ctx, event, bk, n, multisig)
+	// 		case *types.Event_TokenSent:
+	// 			ok = handleTokenSent(ctx, event, bk, n)
+	// 		case *types.Event_Transfer:
+	// 			ok = handleConfirmDeposit(ctx, event, ck, n, chain)
+	// 		case *types.Event_TokenDeployed:
+	// 			ok = handleTokenDeployed(ctx, event, ck, chain)
+	// 		case *types.Event_MultisigOperatorshipTransferred:
+	// 			ok = handleMultisigTransferKey(ctx, event, ck, multisig, chain)
+	// 		default:
+	// 			bk.Logger(ctx).Debug("unsupported event type %T", event,
+	// 				"chain", chain.Name.String(),
+	// 				"eventID", event.GetID(),
+	// 			)
+
+	// 			ok = false
+	// 		}
+
+	// 		if !ok {
+	// 			funcs.MustNoErr(ck.SetEventFailed(ctx, event.GetID()))
+	// 			continue
+	// 		}
+
+	// 		bk.Logger(ctx).Debug("completed handling event",
+	// 			"chain", chain.Name.String(),
+	// 			"eventID", event.GetID(),
+	// 		)
+
+	// 		if err := ck.SetEventCompleted(ctx, event.GetID()); err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }
